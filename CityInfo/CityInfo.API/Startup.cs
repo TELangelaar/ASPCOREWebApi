@@ -1,14 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
 
 namespace CityInfo.API
 {
@@ -25,6 +20,17 @@ namespace CityInfo.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            // chain AddJsonOptions on AddMvc() to create PascalCase jsons in your response bodies.
+
+            //        .AddJsonOptions(o =>
+            //{
+            //    if (o.SerializerSettings.ContractResolver != null)
+            //    {
+            //        var castedResolver = o.SerializerSettings.ContractResolver as DefaultContractResolver;
+            //        castedResolver.NamingStrategy = null;
+            //    }
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,6 +45,8 @@ namespace CityInfo.API
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+
+            app.UseStatusCodePages();
 
             app.UseMvc();
         }
