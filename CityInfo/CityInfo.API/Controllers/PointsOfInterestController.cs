@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using CityInfo.API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CityInfo.API.Controllers
 {
@@ -12,17 +14,33 @@ namespace CityInfo.API.Controllers
     [Route("api/cities/{cityId}/[controller]")]
     public class PointsOfInterestController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult GetPointsOfInterest(int cityId, int id)
+        private readonly ILogger<PointsOfInterestController> _logger;
+
+        public PointsOfInterestController(ILogger<PointsOfInterestController> logger)
         {
-            var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
-            if (city == null)
+        [HttpGet]
+        public IActionResult GetPointsOfInterest(int cityId)
+        {
+            try
             {
-                return NotFound();
-            }
+                var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
 
-            return Ok(city.PointsOfInterest);
+                if (city == null)
+                {
+                    _logger.LogInformation($"City with id {cityId} was not found when accessing points of interest.");
+                    return NotFound();
+                }
+
+                return Ok(city.PointsOfInterest);
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical($"Exception while getting points of interest for city with id {cityId}.", e);
+                return StatusCode(500, "A problem happened while handling your request");
+            }
         }
 
         [HttpGet("{id}", Name = "GetPointOfInterest")]
