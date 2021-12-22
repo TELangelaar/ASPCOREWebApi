@@ -1,16 +1,21 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace CityInfo.API.Services
 {
     public class CloudMailService : IMailService
     {
         private readonly ILogger<CloudMailService> _logger;
-        private string _mailTo = "admin@mycompany.com";
-        private string _mailFrom = "noreply@mycompany.com";
+        private readonly IConfiguration _configuration;
+        private readonly string _mailTo;
+        private readonly string _mailFrom;
 
-        public CloudMailService(ILogger<CloudMailService> logger)
+        public CloudMailService(ILogger<CloudMailService> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
+            _mailTo = _configuration["mailSettings:mailToAddress"];
+            _mailFrom = _configuration["mailSettings:mailFromAddress"];
         }
         public void Send(string subject, string message)
         {
