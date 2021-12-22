@@ -57,6 +57,11 @@ namespace CityInfo.API.Services
 
         }
 
+        public void UpdatePointOfInterestForCity(int cityId, PointOfInterest pointOfInterest)
+        {
+
+        }
+
         public bool Save()
         {
             return (_context.SaveChanges() >= 0);
