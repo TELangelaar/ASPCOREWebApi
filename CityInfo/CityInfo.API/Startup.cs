@@ -42,6 +42,8 @@ namespace CityInfo.API
             //    }
             //});
 
+            services.AddSwaggerGen();
+
 #if DEBUG
             services.AddTransient<IMailService, LocalMailService>();
 #else
@@ -74,6 +76,11 @@ namespace CityInfo.API
             app.UseStatusCodePages();
 
             app.UseMvc();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "CityInfo API");
+            });
         }
     }
 }
