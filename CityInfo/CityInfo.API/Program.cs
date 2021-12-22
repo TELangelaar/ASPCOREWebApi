@@ -38,8 +38,6 @@ namespace CityInfo.API
                     {
                         var context = scope.ServiceProvider.GetService<CityInfoContext>();
 
-                        // for demo purposes, delete the db & migrate on startup so we can start with a clean slate
-                        context.Database.EnsureDeleted();
                         context.Database.Migrate();
                     }
                     catch (Exception ex)
