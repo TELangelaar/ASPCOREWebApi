@@ -1,9 +1,12 @@
 ﻿using System;
 using System.IO;
+using CityInfo.API.Contexts;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace CityInfo.API
@@ -27,7 +30,25 @@ namespace CityInfo.API
             try
             {
                 Log.Information("Host starting...");
-                CreateWebHostBuilder(args).Build().Run();
+                var host = CreateWebHostBuilder(args).Build();
+
+                using (var scope = host.Services.CreateScope())
+                {
+                    try
+                    {
+                        var context = scope.ServiceProvider.GetService<CityInfoContext>();
+
+                        // for demo purposes, delete the db & migrate on startup so we can start with a clean slate
+                        context.Database.EnsureDeleted();
+                        context.Database.Migrate();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "An error occurred while migrating the database.");
+                    }
+                }
+
+                host.Run();
             }
             catch (Exception ex)
             {
